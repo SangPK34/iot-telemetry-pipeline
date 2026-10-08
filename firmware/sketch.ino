@@ -237,6 +237,9 @@ void publishTelemetry(uint32_t nowMs) {
     return;
   }
 
+  // PubSubClient's two-argument publish overload is QoS 0. The gateway
+  // subscribes at QoS 1, but that does not turn this device-to-broker hop into
+  // an end-to-end QoS 1 link.
   const bool published = mqttClient.publish(MQTT_TOPIC, payload);
   Serial.printf("topic=%s publish=%s payload=%s\n", MQTT_TOPIC,
                 published ? "OK" : "FAILED", payload);

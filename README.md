@@ -2,9 +2,13 @@
 
 Dự án xây dựng đầy đủ pipeline thu thập, lưu trữ, tiền xử lý và giám sát dữ liệu IoT theo yêu cầu Bài thực hành số 2 của học phần **IoT và Ứng dụng (INT14149)**.
 
+**Sinh viên:** Phạm Khắc Sang — **B23DCAT257**
+
+**Học kỳ:** 1, năm học 2026–2027
+
 ```mermaid
 flowchart LR
-    A[ESP32 + DHT22 + HC-SR04] -->|JSON / MQTT QoS 1| B[Mosquitto]
+    A[ESP32 + DHT22 + HC-SR04] -->|JSON / MQTT| B[Mosquitto]
     B --> C[Python Gateway]
     C -->|sensor_raw + pipeline_event| D[(InfluxDB: iot_raw)]
     D --> E[Preprocessing]
@@ -52,6 +56,7 @@ IoT_Lab2_Submission/
 - ESP32 đọc `temperature_c`, `humidity_pct` từ DHT22 và `distance_cm` từ HC-SR04 mỗi 5 giây.
 - Firmware publish JSON lên topic `iot/lab2/esp32-01/telemetry`.
 - Gateway subscribe `iot/lab2/+/telemetry` với QoS 1, validate payload, phát hiện duplicate/sequence gap, tính latency và ghi InfluxDB.
+- Firmware dùng `PubSubClient.publish(topic, payload)` nên bản tin từ ESP32 được publish với QoS 0; QoS 1 của gateway là QoS khi đăng ký nhận, không phải cam kết QoS end-to-end.
 - Chương trình preprocessing đọc dữ liệu raw theo khoảng thời gian, sửa lỗi ngắn hạn, resample theo phút và tạo đặc trưng.
 - Grafana hiển thị dữ liệu thời gian thực, dữ liệu đã xử lý, latency p95 và số mẫu hợp lệ.
 
@@ -157,7 +162,7 @@ Sơ đồ chân:
 | HC-SR04 ECHO | GPIO18 |
 | LED qua điện trở 220 Ω | GPIO2 |
 
-Wokwi truy cập broker trên máy host qua `host.wokwi.internal:1884`. Gateway Python trên máy tính dùng `127.0.0.1:1884`.
+Wokwi truy cập broker trên máy host qua `host.wokwi.internal:1884`. Gateway Python trên máy tính dùng `127.0.0.1:1884`. Với mạch thật, cần kiểm tra mức điện áp chân ECHO của HC-SR04 trước khi nối trực tiếp vào ESP32.
 
 ## 9. Thiết kế lưu trữ InfluxDB
 
